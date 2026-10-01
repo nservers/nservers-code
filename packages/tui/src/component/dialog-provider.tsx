@@ -17,12 +17,13 @@ import { useBindings } from "../keymap"
 import { useClipboard } from "../context/clipboard"
 
 const PROVIDER_PRIORITY: Record<string, number> = {
-  opencode: 0,
-  "opencode-go": 1,
-  openai: 2,
-  "github-copilot": 3,
-  anthropic: 4,
-  google: 5,
+  nservers: 0,
+  opencode: 1,
+  "opencode-go": 2,
+  openai: 3,
+  "github-copilot": 4,
+  anthropic: 5,
+  google: 6,
 }
 
 const CUSTOM_PROVIDER_OPTION_VALUE = "__opencode_custom_provider__"
@@ -59,7 +60,8 @@ export function providerOptions(list: { id: string; name: string }[]): ProviderO
         value: provider.id,
         providerID: provider.id,
         description: {
-          opencode: "(Recommended)",
+          nservers: "(Recommended — nServers account)",
+          opencode: "(API key)",
           anthropic: "(API key)",
           openai: "(ChatGPT Plus/Pro or API key)",
           "opencode-go": "Low cost subscription for everyone",
@@ -368,6 +370,17 @@ function ApiMethod(props: ApiMethodProps) {
       placeholder="API key"
       description={() =>
         ({
+          nservers: (
+            <box gap={1}>
+              <text fg={theme.textMuted}>
+                nServers Code gives you access to the curated model catalog billed to your nServers account.
+              </text>
+              <text fg={theme.text}>
+                Run <span style={{ fg: theme.primary }}>nservers-code nservers login</span> or get a key at{" "}
+                <span style={{ fg: theme.primary }}>https://nservers.app/ai-ntokens</span>
+              </text>
+            </box>
+          ),
           opencode: (
             <box gap={1}>
               <text fg={theme.textMuted}>

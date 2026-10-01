@@ -12,9 +12,39 @@ out of the box, authenticates via the nServers account, and sends
 | Built-in `nservers` provider preset | ✅ done | `packages/opencode/src/config/nservers.ts` + `config.ts` (`loadGlobal`) |
 | `nservers login` device flow | ✅ done | `packages/opencode/src/cli/cmd/nservers.ts` — `nservers login\|logout\|status`, device authorization contra `api.nservers.io`, escreve `auth.json` (`{"nservers":{type:"api"}}`), token no stdout p/ `auth login --url` |
 | `.well-known/opencode` remote config | ✅ done | `nservers-ai-api`: `GET /.well-known/opencode` com `auth.command` + catálogo dinâmico |
-| Binary/package rename to `nservers-code` | ⏳ pending | packaging scripts only (see UPSTREAM_SYNC.md) |
-| npm publish `@nservers/code` (fallback `nservers-code`) | ⏳ pending | release pipeline |
-| Branding pass (TUI header, docs, screenshots) | ⏳ pending | keep `LICENSE` + upstream attribution |
+| Binary/package rename to `nservers-code` | ✅ done | `bin/nservers-code`, `package.json`, `build/postinstall/publish` scripts |
+| npm publish `nservers-code` | ⏳ pending | release pipeline (`npm publish --access public`) |
+| Branding pass (TUI header, docs, screenshots) | ✅ done | theme + wordmark + strings (see below) |
+
+## Branding (visual identity)
+
+- **Theme**: `packages/tui/src/theme/assets/nservers.json` — paleta da marca
+  (indigo `#818cf8`/`#4f46e5`, cyan `#22d3ee`, violet `#a78bfa`, slate bg
+  `#050914`). Registrado em `theme/index.ts` (`DEFAULT_THEMES`) e virou o
+  default em `context/theme.tsx`. Usuário ainda pode trocar via `/themes`.
+- **Wordmark**: `tui/src/logo.ts` (ASCII "nservers" two-tone, mesmo grid 4×3 do
+  upstream), `tui/src/util/presentation.ts` (epílogo de sessão) e
+  `opencode/src/cli/ui.ts` (wordmark flat para prompts não-TTY) — as três
+  cópias sincronizadas.
+- **Strings**: título do terminal, sound pack (`nservers.default`), docs
+  (`docs.open` → nservers.com.br/docs/nservers-code), tips (`nservers-code ...`
+  + tip `nservers login`), crash report → `nservers/nservers-code` issues,
+  permission/uninstall/splash texts "nServers Code".
+- **Provider UX**: `nservers` é prioridade 0 no `/connect` ("Recommended —
+  nServers account"), com bloco apontando `nservers-code nservers login` e
+  nservers.app/ai-ntokens. Providers upstream (opencode zen/go) mantidos com
+  descrições próprias.
+- **Upsell**: rate-limit no provider `nservers` dispara o dialog de upgrade
+  com link `nservers.com.br/code` (antes `opencode.ai/go`); mini-logo `ns` na
+  animação BgPulse.
+- **Distribuição**: `Installation` repontado — npm `nservers-code`, GitHub
+  releases `nservers/nservers-code`, curl installer
+  `https://nservers.com.br/install-code.sh` (script em `nservers-site/public/`),
+  install dir `~/.nservers/bin` (sem colisão com `~/.opencode/bin` do stock).
+- **⚠️ `/share`**: ainda posta no backend upstream (`opncd.ai`) quando não há
+  conta enterprise — sessões vazam para domínio de terceiro. Opções: repontar
+  `enterprise.url` p/ um share backend nosso (não existe ainda) ou desligar o
+  comando no fork. Pendente de decisão.
 
 ## Architecture notes
 
@@ -46,16 +76,25 @@ plan enforcement of CLI-specific limits, and feature flags.
 ### Model catalog
 
 `/v1/models` on the gateway returns the public catalog filtered by the
-caller's plan. The preset ships two static aliases (`code-standard`,
-`code-premium`); the dynamic catalog should be wired through the well-known
-config so new models appear without CLI updates.
+caller's plan. The preset ships the real public keys (`nservers:router`,
+`openai:gpt-5.5`, `openai:gpt-5.4-mini`, `gemini:gemini-3.5-flash`,
+`qwen:qwen3-coder`, `deepseek:deepseek-v4-pro`); new models also appear
+via the well-known remote config without CLI updates.
+
+### Login
+
+`nservers-code nservers login|logout|status` — device authorization flow
+against `api.nservers.io` (existing infra). The gateway advertises it via
+`wellknown.auth.command = ["nservers-code","nservers","login"]`.
 
 ## Release checklist (when ready)
 
 1. `bun install && bun run --cwd packages/opencode typecheck` — ✅ limpo (bun 1.4.2, 2026-02-15)
-2. Package rename + npm publish — **scope check 2026-02-15: `@nservers/code`
-   e `nservers-code` livres**; scoped exige org `@nservers` criado em
-   npmjs.com primeiro (404 ≠ scope nosso) — fallback: `nservers-code` unscoped
+2. ✅ Package rename (2026-02-15): `name: nservers-code` (unscoped — org
+   `@nservers` no npm não existe; escopo confirmado livre para uso futuro),
+   `bin: nservers-code`, pacotes de plataforma `nservers-code-{os}-{arch}`,
+   shim `bin/nservers-code`, `script/build.ts`/`postinstall.mjs`/`publish.ts`
+   alinhados. Pendente só o `npm publish` em si + releases GitHub.
 3. `install/` script adapted to download our binaries
 4. GitHub releases with platform binaries (bun compiled targets)
 5. Docs: `nservers.com.br/code` + `docs/nservers-code/*` on the site

@@ -21,21 +21,51 @@ export const NSERVERS_PRESET: ConfigV1.Info = {
           "x-client-name": NSERVERS_CLIENT_NAME,
         },
       },
+      // Keys públicos reais do catálogo (GET /v1/models). `nservers:router`
+      // é o auto-route do plano; os demais são a allowlist dos planos code_*.
       models: {
-        "code-standard": {
-          name: "nServers Code Standard",
+        "nservers:router": {
+          name: "nServers Router (Auto)",
+          tool_call: true,
+          temperature: true,
+          attachment: true,
+          reasoning: true,
+          limit: { context: 1_050_000, output: 128_000 },
+        },
+        "openai:gpt-5.5": {
+          name: "GPT-5.5",
+          tool_call: true,
+          temperature: true,
+          attachment: true,
+          reasoning: true,
+          limit: { context: 1_050_000, output: 128_000 },
+        },
+        "openai:gpt-5.4-mini": {
+          name: "GPT-5.4 Mini",
           tool_call: true,
           temperature: true,
           attachment: true,
           limit: { context: 256_000, output: 32_000 },
         },
-        "code-premium": {
-          name: "nServers Code Premium",
+        "gemini:gemini-3.5-flash": {
+          name: "Gemini 3.5 Flash",
           tool_call: true,
           temperature: true,
           attachment: true,
+          limit: { context: 1_000_000, output: 65_000 },
+        },
+        "qwen:qwen3-coder": {
+          name: "Qwen3 Coder",
+          tool_call: true,
+          temperature: true,
+          limit: { context: 256_000, output: 32_000 },
+        },
+        "deepseek:deepseek-v4-pro": {
+          name: "DeepSeek V4 Pro",
+          tool_call: true,
+          temperature: true,
           reasoning: true,
-          limit: { context: 256_000, output: 64_000 },
+          limit: { context: 256_000, output: 32_000 },
         },
       },
     },

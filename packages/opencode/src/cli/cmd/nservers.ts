@@ -67,7 +67,7 @@ const login = effectCmd({
       if (poll.status === 200 && poll.body?.access_token) {
         const token = String(poll.body.access_token)
         yield* Effect.orDie(auth.set("nservers", { type: "api", key: token }))
-        yield* Prompt.log.success("Logged in — provider `nservers` is ready. Run `opencode` and pick a model.")
+        yield* Prompt.log.success("Logged in — provider `nservers` is ready. Run `nservers-code` and pick a model.")
         // Última linha do stdout = token puro — contrato do `opencode auth
         // login --url` (wellknown.auth.command) que captura o stdout.
         process.stdout.write(`${token}\n`)
@@ -81,7 +81,7 @@ const login = effectCmd({
       }
       yield* fail(`Login failed: ${err || `status ${poll.status}`}`)
     }
-    yield* fail("Device authorization expired — run `nservers login` again")
+    yield* fail("Device authorization expired — run `nservers-code nservers login` again")
   }),
 })
 
@@ -104,7 +104,7 @@ const status = effectCmd({
     const auth = yield* Auth.Service
     const cred = yield* Effect.orDie(auth.get("nservers"))
     if (!cred) {
-      yield* Prompt.log.warn("Not logged in — run `nservers login`")
+      yield* Prompt.log.warn("Not logged in — run `nservers-code nservers login`")
       return
     }
     const key = cred.type === "api" ? cred.key : cred.type === "wellknown" ? cred.token : cred.access
