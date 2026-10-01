@@ -41,10 +41,11 @@ out of the box, authenticates via the nServers account, and sends
   releases `nservers/nservers-code`, curl installer
   `https://nservers.com.br/install-code.sh` (script em `nservers-site/public/`),
   install dir `~/.nservers/bin` (sem colisão com `~/.opencode/bin` do stock).
-- **⚠️ `/share`**: ainda posta no backend upstream (`opncd.ai`) quando não há
-  conta enterprise — sessões vazam para domínio de terceiro. Opções: repontar
-  `enterprise.url` p/ um share backend nosso (não existe ainda) ou desligar o
-  comando no fork. Pendente de decisão.
+- **`/share` desligado por default**: `share-next.ts` agora lança erro claro
+  quando não há `enterprise.url` configurada — nada de sessão vazando pro
+  backend upstream (`opncd.ai`). Pra reativar quando houver share backend
+  nServers, basta setar `enterprise.url` no config. `nservers-code import`
+  segue lendo URLs públicas do upstream (migração legada).
 
 ## Architecture notes
 

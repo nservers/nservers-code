@@ -207,7 +207,13 @@ const layer = Layer.effect(
       const headers: Record<string, string> = {}
       const active = yield* account.active()
       if (Option.isNone(active) || !active.value.active_org_id) {
-        const baseUrl = (yield* cfg.get()).enterprise?.url ?? "https://opncd.ai"
+        // nServers fork: não usar o backend upstream (opncd.ai) — dados de
+        // sessão não saem pra terceiros. Share só funciona quando o backend
+        // próprio estiver configurado via enterprise.url.
+        const baseUrl = (yield* cfg.get()).enterprise?.url
+        if (!baseUrl) {
+          throw new Error("Session sharing is unavailable: nServers share backend is not configured yet (enterprise.url)")
+        }
         return { headers, api: legacyApi, baseUrl } satisfies Req
       }
 
