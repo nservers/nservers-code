@@ -144,7 +144,7 @@ const layer: Layer.Layer<Service, never, HttpClient.HttpClient | AppProcess.Serv
 
     const upgradeCurl = Effect.fnUntraced(
       function* (target: string) {
-        const response = yield* httpOk.execute(HttpClientRequest.get("https://nservers.com.br/install-code.sh"))
+        const response = yield* httpOk.execute(HttpClientRequest.get("https://nservers.io/install-code.sh"))
         const body = yield* response.text
         const bodyBytes = new TextEncoder().encode(body)
         const shell = yield* upgradeScriptShell()

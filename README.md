@@ -10,15 +10,15 @@
   <a href="README.br.md">Português (Brasil)</a>
 </p>
 
-[![nServers Code Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://nservers.com.br/code)
+[![nServers Code Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://nservers.io/code)
 
-nServers Code is a terminal AI coding agent that plugs into the [nServers](https://nservers.com.br) AI platform. It is a maintained fork of [OpenCode](https://github.com/anomalyco/opencode) — same open agent architecture, wired to our model gateway, plans and billing.
+nServers Code is a terminal AI coding agent that plugs into the [nServers](https://nservers.io) AI platform. It is a maintained fork of [OpenCode](https://github.com/anomalyco/opencode) — same open agent architecture, wired to our model gateway, plans and billing.
 
 ### Installation
 
 ```bash
 # Install script (macOS / Linux) — installs to ~/.nservers/bin
-curl -fsSL https://nservers.com.br/install-code.sh | bash
+curl -fsSL https://nservers.io/install-code.sh | bash
 
 # npm (any OS, including Windows)
 npm i -g nservers-code
@@ -27,8 +27,8 @@ npm i -g nservers-code
 The installer accepts `INSTALL_DIR` (custom path) and `VERSION` (pin a release):
 
 ```bash
-INSTALL_DIR=/usr/local/bin curl -fsSL https://nservers.com.br/install-code.sh | bash
-VERSION=0.3.1 curl -fsSL https://nservers.com.br/install-code.sh | bash
+INSTALL_DIR=/usr/local/bin curl -fsSL https://nservers.io/install-code.sh | bash
+VERSION=0.3.1 curl -fsSL https://nservers.io/install-code.sh | bash
 ```
 
 ### Getting started

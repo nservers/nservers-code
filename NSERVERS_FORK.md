@@ -27,7 +27,7 @@ out of the box, authenticates via the nServers account, and sends
   `opencode/src/cli/ui.ts` (wordmark flat para prompts não-TTY) — as três
   cópias sincronizadas.
 - **Strings**: título do terminal, sound pack (`nservers.default`), docs
-  (`docs.open` → nservers.com.br/docs/nservers-code), tips (`nservers-code ...`
+  (`docs.open` → nservers.io/docs/nservers-code), tips (`nservers-code ...`
   + tip `nservers login`), crash report → `nservers/nservers-code` issues,
   permission/uninstall/splash texts "nServers Code".
 - **Provider UX**: `nservers` é prioridade 0 no `/connect` ("Recommended —
@@ -35,11 +35,11 @@ out of the box, authenticates via the nServers account, and sends
   nservers.app/ai-ntokens. Providers upstream (opencode zen/go) mantidos com
   descrições próprias.
 - **Upsell**: rate-limit no provider `nservers` dispara o dialog de upgrade
-  com link `nservers.com.br/code` (antes `opencode.ai/go`); mini-logo `ns` na
+  com link `nservers.io/code` (antes `opencode.ai/go`); mini-logo `ns` na
   animação BgPulse.
 - **Distribuição**: `Installation` repontado — npm `nservers-code`, GitHub
   releases `nservers/nservers-code`, curl installer
-  `https://nservers.com.br/install-code.sh` (script em `nservers-site/public/`),
+  `https://nservers.io/install-code.sh` (script em `nservers-site/public/`),
   install dir `~/.nservers/bin` (sem colisão com `~/.opencode/bin` do stock).
 - **`/share` desligado por default**: `share-next.ts` agora lança erro claro
   quando não há `enterprise.url` configurada — nada de sessão vazando pro
@@ -124,7 +124,7 @@ against `api.nservers.io` (existing infra). The gateway advertises it via
    shim `bin/nservers-code`, `script/build.ts`/`postinstall.mjs`/`publish.ts`
    alinhados. Pendente só o `npm publish` em si + releases GitHub.
 3. ✅ Installer: upstream `install` removido — o canônico é
-   `nservers.com.br/install-code.sh` (nservers-site/public), instala
+   `nservers.io/install-code.sh` (nservers-site/public), instala
    `~/.nservers/bin` baixando artifacts `nservers-code-*` das releases.
 4. GitHub releases with platform binaries (bun compiled targets)
-5. Docs: `nservers.com.br/code` + `docs/nservers-code/*` on the site
+5. Docs: `nservers.io/code` + `docs/nservers-code/*` on the site

@@ -268,7 +268,7 @@ export async function installWslNserversCode(version: string, distro: string, op
   return runInteractiveCommand(
     resolveSystem32Command("wsl.exe"),
     wslArgs(
-      ["bash", "-lc", `curl -fsSL https://nservers.com.br/install-code.sh | bash -s -- --version ${shellEscape(version)}`],
+      ["bash", "-lc", `curl -fsSL https://nservers.io/install-code.sh | bash -s -- --version ${shellEscape(version)}`],
       distro,
     ),
     withTimeout(opts, DEFAULT_WSL_INSTALL_TIMEOUT_MS),

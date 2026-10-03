@@ -821,7 +821,7 @@ function App(props: { onSnapshot?: () => Promise<string[]>; pluginHost: TuiPlugi
         name: "docs.open",
         title: "Open docs",
         run: () => {
-          openUrl("https://nservers.com.br/docs/nservers-code").catch(() => {})
+          openUrl("https://nservers.io/docs/nservers-code").catch(() => {})
           dialog.clear()
         },
         category: "System",

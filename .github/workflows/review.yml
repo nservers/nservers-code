@@ -32,7 +32,7 @@ jobs:
       - uses: ./.github/actions/setup-bun
 
       - name: Install nServers Code
-        run: curl -fsSL https://nservers.com.br/install-code.sh | bash
+        run: curl -fsSL https://nservers.io/install-code.sh | bash
 
       - name: Get PR details
         id: pr-details

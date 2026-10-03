@@ -37,7 +37,7 @@ jobs:
 
       - name: Install nServers Code
         if: steps.team-check.outputs.is_team != 'true'
-        run: curl -fsSL https://nservers.com.br/install-code.sh | bash
+        run: curl -fsSL https://nservers.io/install-code.sh | bash
 
       - name: Build prompt
         if: steps.team-check.outputs.is_team != 'true'

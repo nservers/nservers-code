@@ -4,10 +4,10 @@
   "version": "1.18.34",
   "type": "module",
   "license": "MIT",
-  "homepage": "https://nservers.com.br",
+  "homepage": "https://nservers.io",
   "author": {
     "name": "nServers",
-    "email": "dev@nservers.com.br"
+    "email": "dev@nservers.io"
   },
   "productName": "nServers Code",
   "scripts": {

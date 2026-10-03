@@ -578,7 +578,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.AUR_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          git config --global user.email "dev@nservers.com.br"
+          git config --global user.email "dev@nservers.io"
           git config --global user.name "nservers"
           ssh-keyscan -H aur.archlinux.org >> ~/.ssh/known_hosts || true
 
