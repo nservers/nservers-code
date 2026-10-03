@@ -7,7 +7,7 @@ import * as Prompt from "../effect/prompt"
 import { openUrl } from "@opencode-ai/core/open"
 import { cmd } from "./cmd"
 
-const API_BASE = "https://api.nservers.io"
+const API_BASE = process.env.NSERVERS_API_URL ?? "https://api.nservers.io"
 const AUTHORIZE_URL = `${API_BASE}/api/v1/device/authorize`
 const TOKEN_URL = `${API_BASE}/api/v1/device/token`
 const SCOPES = ["profile:read", "ai:ask", "ai:models:read", "ai:usage:read", "auth:tokens:revoke"]

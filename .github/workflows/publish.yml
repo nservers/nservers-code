@@ -33,8 +33,8 @@ permissions:
 
 jobs:
   version:
-    runs-on: blacksmith-4vcpu-ubuntu-2404
-    if: github.repository == 'anomalyco/opencode'
+    runs-on: ubuntu-latest
+    if: github.repository == 'nservers/nservers-code'
     steps:
       - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
         with:
@@ -46,12 +46,12 @@ jobs:
         id: committer
         uses: ./.github/actions/setup-git-committer
         with:
-          opencode-app-id: ${{ vars.OPENCODE_APP_ID }}
-          opencode-app-secret: ${{ secrets.OPENCODE_APP_SECRET }}
+          app-id: ${{ vars.NSERVERS_APP_ID }}
+          app-secret: ${{ secrets.NSERVERS_APP_SECRET }}
 
-      - name: Install OpenCode
+      - name: Install nServers Code
         if: inputs.bump || inputs.version
-        run: bun i -g opencode-ai
+        run: bun i -g nservers-code
 
       - id: version
         run: |
@@ -60,8 +60,8 @@ jobs:
           GH_TOKEN: ${{ steps.committer.outputs.token }}
           OPENCODE_BUMP: ${{ inputs.bump }}
           OPENCODE_VERSION: ${{ inputs.version }}
-          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
-          GH_REPO: ${{ (github.ref_name == 'beta' && 'anomalyco/opencode-beta') || github.repository }}
+          NSERVERS_API_KEY: ${{ secrets.NSERVERS_API_KEY }}
+          GH_REPO: ${{ github.repository }}
     outputs:
       version: ${{ steps.version.outputs.version }}
       release: ${{ steps.version.outputs.release }}
@@ -70,8 +70,8 @@ jobs:
 
   build-cli:
     needs: version
-    runs-on: blacksmith-4vcpu-ubuntu-2404
-    if: github.repository == 'anomalyco/opencode'
+    runs-on: ubuntu-latest
+    if: github.repository == 'nservers/nservers-code'
     steps:
       - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
         with:
@@ -83,8 +83,8 @@ jobs:
         id: committer
         uses: ./.github/actions/setup-git-committer
         with:
-          opencode-app-id: ${{ vars.OPENCODE_APP_ID }}
-          opencode-app-secret: ${{ secrets.OPENCODE_APP_SECRET }}
+          app-id: ${{ vars.NSERVERS_APP_ID }}
+          app-secret: ${{ secrets.NSERVERS_APP_SECRET }}
 
       - name: Build
         id: build
@@ -99,19 +99,19 @@ jobs:
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: opencode-cli
+          name: nservers-code
           path: |
-            packages/opencode/dist/opencode-darwin*
-            packages/opencode/dist/opencode-linux*
+            packages/opencode/dist/nservers-code-darwin*
+            packages/opencode/dist/nservers-code-linux*
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: opencode-cli-windows
-          path: packages/opencode/dist/opencode-windows*
+          name: nservers-code-windows
+          path: packages/opencode/dist/nservers-code-windows*
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: opencode-preview-cli
+          name: nservers-preview-cli
           path: packages/cli/dist/cli-*
 
     outputs:
@@ -122,7 +122,7 @@ jobs:
       - build-cli
       - version
     runs-on: macos-26
-    if: github.repository == 'anomalyco/opencode'
+    if: github.repository == 'nservers/nservers-code'
     steps:
       - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
 
@@ -134,15 +134,15 @@ jobs:
 
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: opencode-cli
+          name: nservers-code
           path: packages/opencode/dist
 
       - name: Setup git committer
         id: committer
         uses: ./.github/actions/setup-git-committer
         with:
-          opencode-app-id: ${{ vars.OPENCODE_APP_ID }}
-          opencode-app-secret: ${{ secrets.OPENCODE_APP_SECRET }}
+          app-id: ${{ vars.NSERVERS_APP_ID }}
+          app-secret: ${{ secrets.NSERVERS_APP_SECRET }}
 
       - name: Sign macOS CLI binaries
         run: |
@@ -152,8 +152,8 @@ jobs:
             exit 1
           fi
 
-          for name in opencode-darwin-arm64 opencode-darwin-x64 opencode-darwin-x64-baseline; do
-            file="packages/opencode/dist/$name/bin/opencode"
+          for name in nservers-code-darwin-arm64 nservers-code-darwin-x64 nservers-code-darwin-x64-baseline; do
+            file="packages/opencode/dist/$name/bin/nservers-code"
             chmod +x "$file"
             codesign \
               --force \
@@ -167,12 +167,12 @@ jobs:
           done
 
       - name: Smoke test signed binary
-        run: ./packages/opencode/dist/opencode-darwin-arm64/bin/opencode --version
+        run: ./packages/opencode/dist/nservers-code-darwin-arm64/bin/nservers-code --version
 
       - name: Repack macOS CLI archives
         working-directory: packages/opencode/dist
         run: |
-          for name in opencode-darwin-arm64 opencode-darwin-x64 opencode-darwin-x64-baseline; do
+          for name in nservers-code-darwin-arm64 nservers-code-darwin-x64 nservers-code-darwin-x64-baseline; do
             rm -f "$name.zip"
             (cd "$name/bin" && zip -r "../../$name.zip" *)
           done
@@ -183,28 +183,28 @@ jobs:
           GH_TOKEN: ${{ steps.committer.outputs.token }}
         run: |
           gh release upload "v${{ needs.version.outputs.version }}" \
-            packages/opencode/dist/opencode-darwin-arm64.zip \
-            packages/opencode/dist/opencode-darwin-x64.zip \
-            packages/opencode/dist/opencode-darwin-x64-baseline.zip \
+            packages/opencode/dist/nservers-code-darwin-arm64.zip \
+            packages/opencode/dist/nservers-code-darwin-x64.zip \
+            packages/opencode/dist/nservers-code-darwin-x64-baseline.zip \
             --clobber \
             --repo "${{ needs.version.outputs.repo }}"
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: opencode-cli-signed-macos
+          name: nservers-code-signed-macos
           path: |
-            packages/opencode/dist/opencode-darwin-arm64
-            packages/opencode/dist/opencode-darwin-x64
-            packages/opencode/dist/opencode-darwin-x64-baseline
-            packages/opencode/dist/opencode-darwin-*.zip
+            packages/opencode/dist/nservers-code-darwin-arm64
+            packages/opencode/dist/nservers-code-darwin-x64
+            packages/opencode/dist/nservers-code-darwin-x64-baseline
+            packages/opencode/dist/nservers-code-darwin-*.zip
           if-no-files-found: error
 
   sign-cli-windows:
     needs:
       - build-cli
       - version
-    runs-on: blacksmith-4vcpu-windows-2025
-    if: github.repository == 'anomalyco/opencode'
+    runs-on: windows-2025
+    if: github.repository == 'nservers/nservers-code'
     env:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
@@ -217,15 +217,15 @@ jobs:
 
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: opencode-cli-windows
+          name: nservers-code-windows
           path: packages/opencode/dist
 
       - name: Setup git committer
         id: committer
         uses: ./.github/actions/setup-git-committer
         with:
-          opencode-app-id: ${{ vars.OPENCODE_APP_ID }}
-          opencode-app-secret: ${{ secrets.OPENCODE_APP_SECRET }}
+          app-id: ${{ vars.NSERVERS_APP_ID }}
+          app-secret: ${{ secrets.NSERVERS_APP_SECRET }}
 
       - name: Azure login
         uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5 # v2.3.0
@@ -240,9 +240,9 @@ jobs:
           signing-account-name: ${{ env.AZURE_TRUSTED_SIGNING_ACCOUNT_NAME }}
           certificate-profile-name: ${{ env.AZURE_TRUSTED_SIGNING_CERTIFICATE_PROFILE }}
           files: |
-            ${{ github.workspace }}\packages\opencode\dist\opencode-windows-arm64\bin\opencode.exe
-            ${{ github.workspace }}\packages\opencode\dist\opencode-windows-x64\bin\opencode.exe
-            ${{ github.workspace }}\packages\opencode\dist\opencode-windows-x64-baseline\bin\opencode.exe
+            ${{ github.workspace }}\packages\opencode\dist\nservers-code-windows-arm64\bin\nservers-code.exe
+            ${{ github.workspace }}\packages\opencode\dist\nservers-code-windows-x64\bin\nservers-code.exe
+            ${{ github.workspace }}\packages\opencode\dist\nservers-code-windows-x64-baseline\bin\nservers-code.exe
           exclude-environment-credential: true
           exclude-workload-identity-credential: true
           exclude-managed-identity-credential: true
@@ -258,9 +258,9 @@ jobs:
         shell: pwsh
         run: |
           $files = @(
-            "${{ github.workspace }}\packages\opencode\dist\opencode-windows-arm64\bin\opencode.exe",
-            "${{ github.workspace }}\packages\opencode\dist\opencode-windows-x64\bin\opencode.exe",
-            "${{ github.workspace }}\packages\opencode\dist\opencode-windows-x64-baseline\bin\opencode.exe"
+            "${{ github.workspace }}\packages\opencode\dist\nservers-code-windows-arm64\bin\nservers-code.exe",
+            "${{ github.workspace }}\packages\opencode\dist\nservers-code-windows-x64\bin\nservers-code.exe",
+            "${{ github.workspace }}\packages\opencode\dist\nservers-code-windows-x64-baseline\bin\nservers-code.exe"
           )
 
           foreach ($file in $files) {
@@ -274,9 +274,9 @@ jobs:
         working-directory: packages/opencode/dist
         shell: pwsh
         run: |
-          Compress-Archive -Path "opencode-windows-arm64\bin\*" -DestinationPath "opencode-windows-arm64.zip" -Force
-          Compress-Archive -Path "opencode-windows-x64\bin\*" -DestinationPath "opencode-windows-x64.zip" -Force
-          Compress-Archive -Path "opencode-windows-x64-baseline\bin\*" -DestinationPath "opencode-windows-x64-baseline.zip" -Force
+          Compress-Archive -Path "nservers-code-windows-arm64\bin\*" -DestinationPath "nservers-code-windows-arm64.zip" -Force
+          Compress-Archive -Path "nservers-code-windows-x64\bin\*" -DestinationPath "nservers-code-windows-x64.zip" -Force
+          Compress-Archive -Path "nservers-code-windows-x64-baseline\bin\*" -DestinationPath "nservers-code-windows-x64-baseline.zip" -Force
 
       - name: Upload signed Windows CLI release assets
         if: needs.version.outputs.release != ''
@@ -285,24 +285,24 @@ jobs:
           GH_TOKEN: ${{ steps.committer.outputs.token }}
         run: |
           gh release upload "v${{ needs.version.outputs.version }}" `
-            "${{ github.workspace }}\packages\opencode\dist\opencode-windows-arm64.zip" `
-            "${{ github.workspace }}\packages\opencode\dist\opencode-windows-x64.zip" `
-            "${{ github.workspace }}\packages\opencode\dist\opencode-windows-x64-baseline.zip" `
+            "${{ github.workspace }}\packages\opencode\dist\nservers-code-windows-arm64.zip" `
+            "${{ github.workspace }}\packages\opencode\dist\nservers-code-windows-x64.zip" `
+            "${{ github.workspace }}\packages\opencode\dist\nservers-code-windows-x64-baseline.zip" `
             --clobber `
             --repo "${{ needs.version.outputs.repo }}"
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: opencode-cli-signed-windows
+          name: nservers-code-signed-windows
           path: |
-            packages/opencode/dist/opencode-windows-arm64
-            packages/opencode/dist/opencode-windows-x64
-            packages/opencode/dist/opencode-windows-x64-baseline
+            packages/opencode/dist/nservers-code-windows-arm64
+            packages/opencode/dist/nservers-code-windows-x64
+            packages/opencode/dist/nservers-code-windows-x64-baseline
 
   build-electron:
     needs:
       - version
-    if: github.repository == 'anomalyco/opencode'
+    if: github.repository == 'nservers/nservers-code'
     continue-on-error: false
     env:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
@@ -323,17 +323,17 @@ jobs:
             target: aarch64-apple-darwin
             platform_flag: --mac --arm64
             bun_install_flags: --os=darwin --cpu=arm64
-          # github-hosted: blacksmith lacks ARM64 MSVC cross-compilation toolchain
+          # arm64 MSVC cross-compile needs a github-hosted runner
           - host: "windows-2025"
             target: aarch64-pc-windows-msvc
             platform_flag: --win --arm64
-          - host: "blacksmith-4vcpu-windows-2025"
+          - host: "windows-2025"
             target: x86_64-pc-windows-msvc
             platform_flag: --win
-          - host: "blacksmith-4vcpu-ubuntu-2404"
+          - host: "ubuntu-latest"
             target: x86_64-unknown-linux-gnu
             platform_flag: --linux
-          - host: "blacksmith-4vcpu-ubuntu-2404-arm"
+          - host: "ubuntu-24.04-arm"
             target: aarch64-unknown-linux-gnu
             platform_flag: --linux --arm64
     runs-on: ${{ matrix.settings.host }}
@@ -388,8 +388,8 @@ jobs:
         id: committer
         uses: ./.github/actions/setup-git-committer
         with:
-          opencode-app-id: ${{ vars.OPENCODE_APP_ID }}
-          opencode-app-secret: ${{ secrets.OPENCODE_APP_SECRET }}
+          app-id: ${{ vars.NSERVERS_APP_ID }}
+          app-secret: ${{ secrets.NSERVERS_APP_SECRET }}
 
       - name: Prepare
         run: bun ./scripts/prepare.ts
@@ -441,10 +441,10 @@ jobs:
         run: |
           if [[ "${{ matrix.settings.target }}" == "x86_64-apple-darwin" ]]; then
             APP_DIR="mac"
-            OUT_NAME="opencode-desktop-mac-x64.app.tar.gz"
+            OUT_NAME="nservers-code-desktop-mac-x64.app.tar.gz"
           elif [[ "${{ matrix.settings.target }}" == "aarch64-apple-darwin" ]]; then
             APP_DIR="mac-arm64"
-            OUT_NAME="opencode-desktop-mac-arm64.app.tar.gz"
+            OUT_NAME="nservers-code-desktop-mac-arm64.app.tar.gz"
           else
             echo "Unknown macOS target: ${{ matrix.settings.target }}"
             exit 1
@@ -463,7 +463,7 @@ jobs:
           $files = @()
           $files += Get-ChildItem "${{ github.workspace }}\packages\desktop\dist\*.exe" | Select-Object -ExpandProperty FullName
           $files += Get-ChildItem "${{ github.workspace }}\packages\desktop\dist\*unpacked\*.exe" | Select-Object -ExpandProperty FullName
-          $files += Get-ChildItem "${{ github.workspace }}\packages\desktop\dist\*unpacked\resources\opencode-cli.exe" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
+          $files += Get-ChildItem "${{ github.workspace }}\packages\desktop\dist\*unpacked\resources\nservers-code.exe" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
 
           foreach ($file in $files | Select-Object -Unique) {
             $sig = Get-AuthenticodeSignature $file
@@ -474,7 +474,7 @@ jobs:
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: opencode-desktop-${{ matrix.settings.target }}
+          name: nservers-code-desktop-${{ matrix.settings.target }}
           path: packages/desktop/dist/*
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -491,7 +491,7 @@ jobs:
       - sign-cli-windows
       - build-electron
     if: always() && !failure() && !cancelled()
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
 
@@ -517,30 +517,30 @@ jobs:
 
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: opencode-cli
+          name: nservers-code
           path: packages/opencode/dist
 
       - name: Remove unsigned macOS CLI binaries
-        run: rm -rf packages/opencode/dist/opencode-darwin*
+        run: rm -rf packages/opencode/dist/nservers-code-darwin*
 
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: opencode-cli-signed-macos
+          name: nservers-code-signed-macos
           path: packages/opencode/dist
 
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: opencode-cli-windows
+          name: nservers-code-windows
           path: packages/opencode/dist
 
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: opencode-cli-signed-windows
+          name: nservers-code-signed-windows
           path: packages/opencode/dist
 
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: opencode-preview-cli
+          name: nservers-preview-cli
           path: packages/cli/dist
 
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
@@ -552,7 +552,7 @@ jobs:
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         if: needs.version.outputs.release
         with:
-          pattern: opencode-desktop-*
+          pattern: nservers-code-desktop-*
           path: /tmp/desktop
           merge-multiple: true
 
@@ -560,8 +560,8 @@ jobs:
         id: committer
         uses: ./.github/actions/setup-git-committer
         with:
-          opencode-app-id: ${{ vars.OPENCODE_APP_ID }}
-          opencode-app-secret: ${{ secrets.OPENCODE_APP_SECRET }}
+          app-id: ${{ vars.NSERVERS_APP_ID }}
+          app-secret: ${{ secrets.NSERVERS_APP_SECRET }}
 
       - name: Cache apt packages (AUR)
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
@@ -578,8 +578,8 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.AUR_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          git config --global user.email "opencode@sst.dev"
-          git config --global user.name "opencode"
+          git config --global user.email "dev@nservers.com.br"
+          git config --global user.name "nservers"
           ssh-keyscan -H aur.archlinux.org >> ~/.ssh/known_hosts || true
 
       - name: Upload desktop release assets

@@ -1,14 +1,15 @@
 {
-  "name": "@opencode-ai/desktop",
+  "name": "@nservers/desktop",
   "private": true,
   "version": "1.18.34",
   "type": "module",
   "license": "MIT",
-  "homepage": "https://opencode.ai",
+  "homepage": "https://nservers.com.br",
   "author": {
-    "name": "OpenCode",
-    "email": "hello@opencode.ai"
+    "name": "nServers",
+    "email": "dev@nservers.com.br"
   },
+  "productName": "nServers Code",
   "scripts": {
     "typecheck": "tsgo -b",
     "predev": "bun ./scripts/predev.ts",

@@ -18,7 +18,7 @@ import { clearWslDistroState, wslServerIdToRestart } from "./policy"
 import { nativeT } from "../native-translations"
 import {
   installWslDistro,
-  installWslOpencode,
+  installWslNserversCode,
   installWslRuntimeElevated,
   listInstalledWslDistros,
   listOnlineWslDistros,
@@ -362,7 +362,7 @@ export function createWslServersController(
 
     async installOpencode(name: string) {
       await runJob({ kind: "install-opencode", distro: name, startedAt: Date.now() }, async (abort) => {
-        const result = await installWslOpencode(appVersion, name, { signal: abort.signal })
+        const result = await installWslNserversCode(appVersion, name, { signal: abort.signal })
         if (result.code !== 0) {
           throw new Error(summarize(result.stderr || result.stdout) || nativeT("desktop.wsl.error.installOpencode"))
         }

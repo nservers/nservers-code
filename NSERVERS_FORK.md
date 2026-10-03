@@ -46,6 +46,33 @@ out of the box, authenticates via the nServers account, and sends
   backend upstream (`opncd.ai`). Pra reativar quando houver share backend
   nServers, basta setar `enterprise.url` no config. `nservers-code import`
   segue lendo URLs públicas do upstream (migração legada).
+- **Desktop/app (Electron)**: identidade completa nServers — `appId`
+  `br.com.nservers.code{,.dev,.beta}`, `productName`/`APP_NAMES` "nServers
+  Code*", scheme `nservers://` (parser aceita `opencode://` legado também),
+  pacotes `nservers-code-*`, artifact `nservers-code-desktop-*`, publish →
+  `nservers/nservers-code`. Binário bundled virou `resources/nservers-code`
+  e passa a ser **buildado do nosso `packages/cli`** (`CLI_TARGET` em
+  `cli/script/build.ts` + `buildCliToResources` em `desktop/scripts/utils.ts`)
+  — antes baixava `@opencode-ai/cli-*` do npm upstream. `copy-metainfo.ts`
+  gera metainfo nServers. i18n: `OpenCode` → `nServers Code` em todos os
+  locales (preservando "OpenCode Zen"/"OpenCode Go" — nomes de provider
+  terceiro). `publish.yml` repontado pro fork + paths `dist/nservers-code-*`
+  corrigidos. **Compat mantida**: `opencode.json`, `OPENCODE_*`,
+  `@opencode-ai/*`, `username: "opencode"` do serviço local, ids Tauri
+  legados na migração de estado.
+- **Docs/CI hygiene**: README.md/README.br.md reescritos (EN + PT-BR; as 20
+  traduções upstream foram removidas — stale > ausente), `install`, `STATS.md`,
+  `CODEOWNERS` (owners upstream), `publish-python-sdk.yml` (dead) deletados;
+  CONTRIBUTING/SECURITY reescritos pro fork (contato `privacidade@nservers.io`).
+  Workflows upstream-only removidos (`deploy`, `docs-locale-sync`,
+  `models-snapshot`, `stats`, `opencode` mention-bot, `publish/release-github-action`,
+  `publish-vscode`); workflows de automação (`review`, `triage`,
+  `duplicate-issues`, `pr-management`) repontados pra `install-code.sh` +
+  `nservers-code` + `secrets.NSERVERS_API_KEY` + runners `ubuntu-latest` (era
+  blacksmith-*). `setup-git-committer` agora usa `vars.NSERVERS_APP_ID`/
+  `secrets.NSERVERS_APP_SECRET`. **Pendente**: provisionar secrets
+  (`NSERVERS_API_KEY`, `NSERVERS_APP_ID/SECRET`, `APPLE_*`, `AZURE_*`,
+  `DISCORD_WEBHOOK`) e atualizar `.github/TEAM_MEMBERS` com nossos handles.
 
 ## Architecture notes
 
@@ -96,6 +123,8 @@ against `api.nservers.io` (existing infra). The gateway advertises it via
    `bin: nservers-code`, pacotes de plataforma `nservers-code-{os}-{arch}`,
    shim `bin/nservers-code`, `script/build.ts`/`postinstall.mjs`/`publish.ts`
    alinhados. Pendente só o `npm publish` em si + releases GitHub.
-3. `install/` script adapted to download our binaries
+3. ✅ Installer: upstream `install` removido — o canônico é
+   `nservers.com.br/install-code.sh` (nservers-site/public), instala
+   `~/.nservers/bin` baixando artifacts `nservers-code-*` das releases.
 4. GitHub releases with platform binaries (bun compiled targets)
 5. Docs: `nservers.com.br/code` + `docs/nservers-code/*` on the site

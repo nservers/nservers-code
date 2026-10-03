@@ -1,129 +1,93 @@
+<h1 align="center">nServers Code</h1>
+<p align="center">O agente de programação com IA para o seu terminal — integrado à plataforma de IA da nServers.</p>
 <p align="center">
-  <a href="https://opencode.ai">
-    <picture>
-      <source srcset="packages/console/app/src/asset/logo-ornate-dark.svg" media="(prefers-color-scheme: dark)">
-      <source srcset="packages/console/app/src/asset/logo-ornate-light.svg" media="(prefers-color-scheme: light)">
-      <img src="packages/console/app/src/asset/logo-ornate-light.svg" alt="Logo do OpenCode">
-    </picture>
-  </a>
-</p>
-<p align="center">O agente de programação com IA de código aberto.</p>
-<p align="center">
-  <a href="https://opencode.ai/discord"><img alt="Discord" src="https://img.shields.io/discord/1391832426048651334?style=flat-square&label=discord" /></a>
-  <a href="https://www.npmjs.com/package/opencode-ai"><img alt="npm" src="https://img.shields.io/npm/v/opencode-ai?style=flat-square" /></a>
-  <a href="https://github.com/anomalyco/opencode/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/anomalyco/opencode/publish.yml?style=flat-square&branch=dev" /></a>
+  <a href="https://www.npmjs.com/package/nservers-code"><img alt="npm" src="https://img.shields.io/npm/v/nservers-code?style=flat-square" /></a>
+  <a href="https://github.com/nservers/nservers-code/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/nservers/nservers-code/publish.yml?style=flat-square&branch=dev" /></a>
 </p>
 
 <p align="center">
   <a href="README.md">English</a> |
-  <a href="README.zh.md">简体中文</a> |
-  <a href="README.zht.md">繁體中文</a> |
-  <a href="README.ko.md">한국어</a> |
-  <a href="README.de.md">Deutsch</a> |
-  <a href="README.es.md">Español</a> |
-  <a href="README.fr.md">Français</a> |
-  <a href="README.it.md">Italiano</a> |
-  <a href="README.da.md">Dansk</a> |
-  <a href="README.ja.md">日本語</a> |
-  <a href="README.pl.md">Polski</a> |
-  <a href="README.ru.md">Русский</a> |
-  <a href="README.bs.md">Bosanski</a> |
-  <a href="README.ar.md">العربية</a> |
-  <a href="README.no.md">Norsk</a> |
-  <a href="README.br.md">Português (Brasil)</a> |
-  <a href="README.th.md">ไทย</a> |
-  <a href="README.tr.md">Türkçe</a> |
-  <a href="README.uk.md">Українська</a> |
-  <a href="README.bn.md">বাংলা</a> |
-  <a href="README.gr.md">Ελληνικά</a> |
-  <a href="README.vi.md">Tiếng Việt</a>
+  <a href="README.br.md">Português (Brasil)</a>
 </p>
 
-[![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
+[![Interface de terminal do nServers Code](packages/web/src/assets/lander/screenshot.png)](https://nservers.com.br/code)
 
----
+O nServers Code é um agente de programação com IA para o terminal, conectado à plataforma de IA da [nServers](https://nservers.com.br). É um fork mantido do [OpenCode](https://github.com/anomalyco/opencode) — mesma arquitetura aberta de agente, integrado ao nosso gateway de modelos, planos e billing.
 
 ### Instalação
 
 ```bash
-# YOLO
-curl -fsSL https://opencode.ai/install | bash
+# Script de instalação (macOS / Linux) — instala em ~/.nservers/bin
+curl -fsSL https://nservers.com.br/install-code.sh | bash
 
-# Gerenciadores de pacotes
-npm i -g opencode-ai@latest        # ou bun/pnpm/yarn
-scoop install opencode             # Windows
-choco install opencode             # Windows
-brew install anomalyco/tap/opencode # macOS e Linux (recomendado, sempre atualizado)
-brew install opencode              # macOS e Linux (fórmula oficial do brew, atualiza menos)
-sudo pacman -S opencode            # Arch Linux (Stable)
-paru -S opencode-bin               # Arch Linux (Latest from AUR)
-mise use -g opencode               # qualquer sistema
-nix run nixpkgs#opencode           # ou github:anomalyco/opencode para a branch dev mais recente
+# npm (qualquer SO, incluindo Windows)
+npm i -g nservers-code
 ```
 
-> [!TIP]
-> Remova versões anteriores a 0.1.x antes de instalar.
-
-### App desktop (BETA)
-
-O OpenCode também está disponível como aplicativo desktop. Baixe diretamente pela [página de releases](https://github.com/anomalyco/opencode/releases) ou em [opencode.ai/download](https://opencode.ai/download).
-
-| Plataforma            | Download                           |
-| --------------------- | ---------------------------------- |
-| macOS (Apple Silicon) | `opencode-desktop-mac-arm64.dmg`   |
-| macOS (Intel)         | `opencode-desktop-mac-x64.dmg`     |
-| Windows               | `opencode-desktop-windows-x64.exe` |
-| Linux                 | `.deb`, `.rpm` ou AppImage         |
+O instalador aceita `INSTALL_DIR` (caminho customizado) e `VERSION` (fixar uma release):
 
 ```bash
-# macOS (Homebrew)
-brew install --cask opencode-desktop
-# Windows (Scoop)
-scoop bucket add extras; scoop install extras/opencode-desktop
+INSTALL_DIR=/usr/local/bin curl -fsSL https://nservers.com.br/install-code.sh | bash
+VERSION=0.3.1 curl -fsSL https://nservers.com.br/install-code.sh | bash
 ```
 
-#### Diretório de instalação
-
-O script de instalação respeita a seguinte ordem de prioridade para o caminho de instalação:
-
-1. `$OPENCODE_INSTALL_DIR` - Diretório de instalação personalizado
-2. `$XDG_BIN_DIR` - Caminho compatível com a especificação XDG Base Directory
-3. `$HOME/bin` - Diretório binário padrão do usuário (se existir ou puder ser criado)
-4. `$HOME/.opencode/bin` - Fallback padrão
+### Primeiros passos
 
 ```bash
-# Exemplos
-OPENCODE_INSTALL_DIR=/usr/local/bin curl -fsSL https://opencode.ai/install | bash
-XDG_BIN_DIR=$HOME/.local/bin curl -fsSL https://opencode.ai/install | bash
+nservers-code nservers login    # login via device-flow com sua conta nServers
+nservers-code                   # abre o TUI
 ```
 
-### Agents
+O provider `nservers` embutido roteia as requisições pelo gateway de IA da nServers. O uso é cobrado pelo seu plano (nServers Code Pro / Max / Ultra / Team), com roteamento automático de modelos via `nservers:router`.
 
-O OpenCode inclui dois agents integrados, que você pode alternar com a tecla `Tab`.
+Comandos úteis:
 
-- **build** - Padrão, agent com acesso total para trabalho de desenvolvimento
-- **plan** - Agent somente leitura para análise e exploração de código
-  - Nega edições de arquivos por padrão
-  - Pede permissão antes de executar comandos bash
-  - Ideal para explorar codebases desconhecidas ou planejar mudanças
+```bash
+nservers-code nservers status   # sessão e plano atual
+nservers-code nservers logout   # revoga as credenciais locais
+nservers-code models            # lista os modelos disponíveis
+nservers-code run "corrija os testes quebrados"   # execução única não-interativa
+```
 
-Também há um subagent **general** para buscas complexas e tarefas em várias etapas.
-Ele é usado internamente e pode ser invocado com `@general` nas mensagens.
+### Agentes
 
-Saiba mais sobre [agents](https://opencode.ai/docs/agents).
+O nServers Code inclui dois agentes embutidos, alternados com a tecla `Tab`.
 
-### Documentação
+- **build** — agente padrão, acesso total ao ambiente de desenvolvimento
+- **plan** — agente somente-leitura para análise e exploração de código
+  - Bloqueia edições de arquivo por padrão
+  - Pede permissão antes de rodar comandos bash
 
-Para mais informações sobre como configurar o OpenCode, [**veja nossa documentação**](https://opencode.ai/docs).
+### App desktop (beta)
 
-### Contribuir
+Builds desktop são publicados na [página de releases](https://github.com/nservers/nservers-code/releases) como artefatos `nservers-code-desktop-*` (`.dmg` para macOS, `.exe` para Windows, `.deb`/`.rpm`/`.AppImage` para Linux). Deep links usam o scheme `nservers://`.
 
-Se você tem interesse em contribuir com o OpenCode, leia os [contributing docs](./CONTRIBUTING.md) antes de enviar um pull request.
+### Configuração
 
-### Construindo com OpenCode
+Compatível com o layout de config do upstream: `opencode.json` no projeto, `~/.config/opencode/` no usuário e variáveis `OPENCODE_*` continuam funcionando.
 
-Se você estiver trabalhando em um projeto relacionado ao OpenCode e estiver usando "opencode" como parte do nome (por exemplo, "opencode-dashboard" ou "opencode-mobile"), adicione uma nota no README para deixar claro que não foi construído pela equipe do OpenCode e não é afiliado a nós de nenhuma forma.
+Overrides de ambiente para apontar o CLI para outra API (ex.: backend local):
+
+```bash
+NSERVERS_GATEWAY_URL=http://localhost:8000   # gateway de modelos
+NSERVERS_API_URL=http://localhost:8080       # API de conta/device
+NSERVERS_DEVICE_URL=http://localhost:3000/device
+```
+
+### Desenvolvimento
+
+```bash
+bun install
+cd packages/opencode
+bun run dev        # roda o CLI/TUI a partir do fonte
+```
+
+A branch padrão é `dev`. Leia o [AGENTS.md](./AGENTS.md) para as regras de arquitetura e convenções de estilo, e o [NSERVERS_FORK.md](./NSERVERS_FORK.md) para o que difere do upstream.
+
+### Contribuindo
+
+Veja [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ---
 
-**Junte-se à nossa comunidade** [Discord](https://discord.gg/opencode) | [X.com](https://x.com/opencode)
+O nServers Code é baseado no [OpenCode](https://github.com/anomalyco/opencode) (MIT), © Anomaly Innovations. A nServers mantém a integração com o provider, o roteamento consciente de billing, a identidade desktop e o pipeline de release.

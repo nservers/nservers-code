@@ -1,9 +1,7 @@
 import { $ } from "bun"
-import { chmod, copyFile, mkdtemp, rm } from "node:fs/promises"
-import { tmpdir } from "node:os"
+import { existsSync } from "node:fs"
+import { chmod, copyFile } from "node:fs/promises"
 import { join } from "node:path"
-
-const CLI_VERSION = "0.0.0-next-16350"
 
 export type Channel = "dev" | "beta" | "prod"
 
@@ -13,40 +11,41 @@ export function resolveChannel(): Channel {
   return "dev"
 }
 
-export const CLI_BINARIES: Array<{ rustTarget: string; package: string; os: string; cpu: string }> = [
+// rustTarget → packages/cli dist name (`cli-*` dirs produced by ../cli/script/build.ts).
+export const CLI_BINARIES: Array<{ rustTarget: string; dist: string; os: string; cpu: string }> = [
   {
     rustTarget: "aarch64-apple-darwin",
-    package: "@opencode-ai/cli-darwin-arm64",
+    dist: "cli-darwin-arm64",
     os: "darwin",
     cpu: "arm64",
   },
   {
     rustTarget: "x86_64-apple-darwin",
-    package: "@opencode-ai/cli-darwin-x64-baseline",
+    dist: "cli-darwin-x64-baseline",
     os: "darwin",
     cpu: "x64",
   },
   {
     rustTarget: "aarch64-pc-windows-msvc",
-    package: "@opencode-ai/cli-windows-arm64",
+    dist: "cli-windows-arm64",
     os: "win32",
     cpu: "arm64",
   },
   {
     rustTarget: "x86_64-pc-windows-msvc",
-    package: "@opencode-ai/cli-windows-x64-baseline",
+    dist: "cli-windows-x64-baseline",
     os: "win32",
     cpu: "x64",
   },
   {
     rustTarget: "x86_64-unknown-linux-gnu",
-    package: "@opencode-ai/cli-linux-x64-baseline",
+    dist: "cli-linux-x64-baseline",
     os: "linux",
     cpu: "x64",
   },
   {
     rustTarget: "aarch64-unknown-linux-gnu",
-    package: "@opencode-ai/cli-linux-arm64",
+    dist: "cli-linux-arm64",
     os: "linux",
     cpu: "arm64",
   },
@@ -69,26 +68,23 @@ export function getCurrentCli(target = RUST_TARGET ?? nativeTarget()) {
   return binaryConfig
 }
 
-export async function downloadCliToResources() {
+// Bundles our own v2 service CLI (packages/cli). In CI the matching dist artifact is
+// already downloaded into ../cli/dist; locally we compile just this target.
+export async function buildCliToResources() {
   const cli = getCurrentCli()
-  const directory = await mkdtemp(join(tmpdir(), "opencode-cli-"))
-  const dest = windowsify("resources/opencode-cli")
-  try {
-    await $`bun install --no-save --cwd ${directory} ${`${cli.package}@${CLI_VERSION}`} ${`--os=${cli.os}`} ${`--cpu=${cli.cpu}`}`
-    await copyFile(
-      join(directory, "node_modules", cli.package, "bin", cli.os === "win32" ? "opencode2.exe" : "opencode2"),
-      dest,
-    )
-  } finally {
-    await rm(directory, { recursive: true, force: true })
+  const source = windowsify(join("..", "cli", "dist", cli.dist, "bin", "lildax"))
+  if (!existsSync(source)) {
+    await $`bun script/build.ts`.cwd(join("..", "cli")).env({ ...process.env, CLI_TARGET: cli.dist.replace(/^cli-/, "") })
   }
+  const dest = windowsify("resources/nservers-code")
+  await copyFile(source, dest)
   if (process.platform !== "win32") await chmod(dest, 0o755)
   if (process.platform === "win32" && process.env.GITHUB_ACTIONS === "true") {
     await $`pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File ../../script/sign-windows.ps1 ${dest}`
   }
   if (process.platform === "darwin") await $`codesign --force --sign - ${dest}`
 
-  console.log(`Copied ${cli.package} to ${dest}`)
+  console.log(`Copied ${cli.dist} to ${dest}`)
 }
 
 export function windowsify(path: string) {

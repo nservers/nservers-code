@@ -40,13 +40,32 @@ const allTargets: {
   { os: "win32", arch: "x64", avx2: false },
 ]
 
-const targets = singleFlag
-  ? allTargets.filter((item) => {
-      if (item.os !== process.platform || item.arch !== process.arch) return false
-      if (item.avx2 === false) return baselineFlag
-      return item.abi === undefined
-    })
-  : allTargets
+// CLI_TARGET selects a single dist target by suffix name (e.g. "windows-x64-baseline",
+// "darwin-arm64") — used by packages/desktop to bundle one prebuilt binary.
+const cliTarget = Bun.env.CLI_TARGET
+const targetName = (item: (typeof allTargets)[number]) =>
+  [
+    item.os === "win32" ? "windows" : item.os,
+    item.arch,
+    item.avx2 === false ? "baseline" : undefined,
+    item.abi,
+  ]
+    .filter(Boolean)
+    .join("-")
+const targets = cliTarget
+  ? allTargets.filter((item) => targetName(item) === cliTarget)
+  : singleFlag
+    ? allTargets.filter((item) => {
+        if (item.os !== process.platform || item.arch !== process.arch) return false
+        if (item.avx2 === false) return baselineFlag
+        return item.abi === undefined
+      })
+    : allTargets
+
+if (targets.length === 0) {
+  console.error(`no build targets matched${cliTarget ? ` CLI_TARGET=${cliTarget}` : ""}`)
+  process.exit(1)
+}
 
 if (!skipInstall) await $`bun install --os="*" --cpu="*" @opentui/core@${pkg.dependencies["@opentui/core"]}`
 
