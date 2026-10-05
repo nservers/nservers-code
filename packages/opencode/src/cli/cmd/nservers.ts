@@ -68,12 +68,10 @@ const login = effectCmd({
         const token = String(poll.body.access_token)
         yield* Effect.orDie(auth.set("nservers", { type: "api", key: token }))
         yield* Prompt.log.success("Logged in — provider `nservers` is ready. Run `nservers-code` and pick a model.")
-        const freePlan = (
-          poll.body as { free_plan?: { key?: string; name?: string; monthly_ai_ntokens?: number } }
-        ).free_plan
+        const freePlan = (poll.body as { free_plan?: { key?: string; name?: string } }).free_plan
         if (freePlan?.key) {
           yield* Prompt.log.info(
-            `${freePlan.name ?? "nServers Code Free"} active — ${freePlan.monthly_ai_ntokens ?? 0} nTokens/month + free models included. Upgrade anytime: https://nservers.io/code`,
+            `${freePlan.name ?? "nServers Code Free"} active — free models included. Upgrade anytime: https://nservers.io/code`,
           )
         }
         // Última linha do stdout = token puro — contrato do `opencode auth
